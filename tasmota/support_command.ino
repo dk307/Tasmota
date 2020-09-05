@@ -716,7 +716,9 @@ void CmndRestart(void)
 void CmndPowerOnState(void)
 {
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
   if (my_module_type != MOTOR)
+#endif  
 #endif  // ESP8266
   {
     /* 0 = Keep relays off after power on

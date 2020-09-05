@@ -698,7 +698,7 @@ const uint8_t kGpioNiceList[] PROGMEM = {
   GPIO_DEEPSLEEP,
 #endif
 #ifdef USE_KEELOQ
-  GPIO_CC1101_GDO0,    // CC1101 pin for RX
+  GP IO_CC1101_GDO0,    // CC1101 pin for RX
   GPIO_CC1101_GDO2,    // CC1101 pin for RX
 #endif
 #ifdef USE_HRXL
@@ -790,6 +790,50 @@ typedef struct MYTMPLT {
 
 /********************************************************************************************/
 // Supported hardware modules
+
+#ifdef NO_SONOFF_MODULE
+enum SupportedModules {
+  WEMOS,
+  MAXMODULE};
+
+  
+const char kModuleNames[] PROGMEM =
+  "Generic"
+  ;
+
+
+const uint8_t kModuleNiceList[] PROGMEM = {
+  WEMOS
+};
+
+#define USER_MODULE        255
+
+
+// Default module settings
+const mytmplt kModules[MAXMODULE] PROGMEM = {
+  {                   // WEMOS - Any ESP8266/ESP8285 device like WeMos and NodeMCU hardware (ESP8266)
+    GPIO_USER,        // GPIO00 D3 Wemos Button Shield
+    GPIO_USER,        // GPIO01 TX Serial RXD
+    GPIO_USER,        // GPIO02 D4 Wemos DHT Shield
+    GPIO_USER,        // GPIO03 RX Serial TXD and Optional sensor
+    GPIO_USER,        // GPIO04 D2 Wemos I2C SDA
+    GPIO_USER,        // GPIO05 D1 Wemos I2C SCL / Wemos Relay Shield (0 = Off, 1 = On) / Wemos WS2812B RGB led Shield
+                      // GPIO06 (SD_CLK   Flash)
+                      // GPIO07 (SD_DATA0 Flash QIO/DIO/DOUT)
+                      // GPIO08 (SD_DATA1 Flash QIO/DIO/DOUT)
+    GPIO_USER,        // GPIO09 (SD_DATA2 Flash QIO or ESP8285)
+    GPIO_USER,        // GPIO10 (SD_DATA3 Flash QIO or ESP8285)
+                      // GPIO11 (SD_CMD   Flash)
+    GPIO_USER,        // GPIO12 D6
+    GPIO_USER,        // GPIO13 D7
+    GPIO_USER,        // GPIO14 D5
+    GPIO_USER,        // GPIO15 D8
+    GPIO_USER,        // GPIO16 D0 Wemos Wake
+    ADC0_USER         // ADC0 A0 Analog input
+  }
+};
+
+#else
 
 enum SupportedModules {
   SONOFF_BASIC, SONOFF_RF, SONOFF_SV, SONOFF_TH, SONOFF_DUAL, SONOFF_POW, SONOFF_4CH, SONOFF_S2X, SLAMPHER, SONOFF_TOUCH,
@@ -2303,6 +2347,7 @@ const mytmplt kModules[MAXMODULE] PROGMEM = {
     0
   }
 };
+#endif
 
 #endif  // ESP8266
 

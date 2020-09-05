@@ -214,6 +214,7 @@ void SetDevicePower(power_t rpower, uint32_t source)
     // Serviced
   }
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
   else if ((SONOFF_DUAL == my_module_type) || (CH4 == my_module_type)) {
     Serial.write(0xA0);
     Serial.write(0x04);
@@ -225,6 +226,7 @@ void SetDevicePower(power_t rpower, uint32_t source)
   else if (EXS_RELAY == my_module_type) {
     SetLatchingRelay(rpower, 1);
   }
+#endif  
 #endif  // ESP8266
   else
   {
@@ -286,9 +288,11 @@ void SetAllPower(uint32_t state, uint32_t source)
 void SetPowerOnState(void)
 {
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
   if (MOTOR == my_module_type) {
     Settings.poweronstate = POWER_ALL_ON;   // Needs always on else in limbo!
   }
+#endif  
 #endif  // ESP8266
   if (POWER_ALL_ALWAYS_ON == Settings.poweronstate) {
     SetDevicePower(1, SRC_RESTART);
@@ -947,9 +951,11 @@ void Every250mSeconds(void)
   if (Settings.ledstate &1 && (PinUsed(GPIO_LEDLNK) || !(blinks || restart_flag || ota_state_flag)) ) {
     bool tstate = power & Settings.ledmask;
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
     if ((SONOFF_TOUCH == my_module_type) || (SONOFF_T11 == my_module_type) || (SONOFF_T12 == my_module_type) || (SONOFF_T13 == my_module_type)) {
       tstate = (!power) ? 1 : 0;                          // As requested invert signal for Touch devices to find them in the dark
     }
+#endif    
 #endif  // ESP8266
     SetLedPower(tstate);
   }
@@ -1326,12 +1332,14 @@ void SerialInput(void)
     }
 
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
 /*-------------------------------------------------------------------------------------------*\
  * Sonoff dual and ch4 19200 baud serial interface
 \*-------------------------------------------------------------------------------------------*/
     if ((SONOFF_DUAL == my_module_type) || (CH4 == my_module_type)) {
       serial_in_byte = ButtonSerial(serial_in_byte);
     }
+#endif    
 #endif  // ESP8266
 /*-------------------------------------------------------------------------------------------*/
 
@@ -1454,7 +1462,11 @@ void GpioInit(void)
     uint32_t module = MODULE;
     if (!ValidModule(MODULE)) {
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
       module = SONOFF_BASIC;
+#else
+      module = WEMOS;
+#endif      
 #endif  // ESP8266
 #ifdef ESP32
       module = WEMOS;
@@ -1565,8 +1577,11 @@ void GpioInit(void)
 //  AddLogBufferSize(LOG_LEVEL_DEBUG, (uint8_t*)gpio_pin, ARRAY_SIZE(gpio_pin), sizeof(gpio_pin[0]));
 
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
   if ((2 == Pin(GPIO_TXD)) || (H801 == my_module_type)) { Serial.set_tx(2); }
-
+#else
+  if ((2 == Pin(GPIO_TXD)) || false) { Serial.set_tx(2); }
+#endif
   analogWriteRange(Settings.pwm_range);      // Default is 1023 (Arduino.h)
   analogWriteFreq(Settings.pwm_frequency);   // Default is 1000 (core_esp8266_wiring_pwm.c)
 
@@ -1665,6 +1680,7 @@ void GpioInit(void)
     // Serviced
   }
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
   else if (YTF_IR_BRIDGE == my_module_type) {
     ClaimSerial();  // Stop serial loopback mode
 //    devices_present = 1;
@@ -1682,6 +1698,7 @@ void GpioInit(void)
     SetSerial(19200, TS_SERIAL_8N1);
   }
 #endif  // USE_SONOFF_SC
+#endif
 #endif  // ESP8266
 
   for (uint32_t i = 0; i < MAX_PWMS; i++) {     // Basic PWM control only
@@ -1707,10 +1724,12 @@ void GpioInit(void)
       pinMode(Pin(GPIO_REL1, i), OUTPUT);
       devices_present++;
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
       if (EXS_RELAY == my_module_type) {
         digitalWrite(Pin(GPIO_REL1, i), bitRead(rel_inverted, i) ? 1 : 0);
         if (i &1) { devices_present--; }
       }
+#endif      
 #endif  // ESP8266
     }
   }

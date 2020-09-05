@@ -81,9 +81,11 @@ void ButtonInit(void)
 {
   Button.present = 0;
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
   if ((SONOFF_DUAL == my_module_type) || (CH4 == my_module_type)) {
     Button.present++;
   }
+#endif  
 #endif  // ESP8266
   for (uint32_t i = 0; i < MAX_KEYS; i++) {
     if (PinUsed(GPIO_KEY1, i)) {
@@ -144,7 +146,11 @@ void ButtonHandler(void)
     uint8_t button_present = 0;
 
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
     if (!button_index && ((SONOFF_DUAL == my_module_type) || (CH4 == my_module_type))) {
+#else
+    if (!button_index && false) {
+#endif      
       button_present = 1;
       if (Button.dual_code) {
         AddLog_P2(LOG_LEVEL_DEBUG, PSTR(D_LOG_APPLICATION D_BUTTON " " D_CODE " %04X"), Button.dual_code);
@@ -207,7 +213,11 @@ void ButtonHandler(void)
         // Serviced
       }
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
       else if (SONOFF_4CHPRO == my_module_type) {
+#else
+      else if (false) {
+#endif        
         if (Button.hold_timer[button_index]) { Button.hold_timer[button_index]--; }
 
         bool button_pressed = false;
@@ -289,9 +299,11 @@ void ButtonHandler(void)
               bool single_press = false;
               if (Button.press_counter[button_index] < 3) {  // Single or Double press
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
                 if ((SONOFF_DUAL_R2 == my_module_type) || (SONOFF_DUAL == my_module_type) || (CH4 == my_module_type)) {
                   single_press = true;
                 } else
+#endif                
 #endif  // ESP8266
                 {
                   single_press = (Settings.flag.button_swap +1 == Button.press_counter[button_index]);  // SetOption11 (0)
@@ -320,9 +332,11 @@ void ButtonHandler(void)
                         if (0 == button_index) {               // BUTTON1 can toggle up to 5 relays if present. If a relay is not present will send out the key value (2,11,12,13 and 14) for rules
                           bool valid_relay = PinUsed(GPIO_REL1, Button.press_counter[button_index]-1);
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
                           if ((SONOFF_DUAL == my_module_type) || (CH4 == my_module_type)) {
                             valid_relay = (Button.press_counter[button_index] <= devices_present);
                           }
+#endif                          
 #endif  // ESP8266
                           if ((Button.press_counter[button_index] > 1) && valid_relay && (Button.press_counter[button_index] <= MAX_RELAY_BUTTON1)) {
                             ExecuteCommandPower(button_index + Button.press_counter[button_index], POWER_TOGGLE, SRC_BUTTON);   // Execute Toggle command internally

@@ -1275,6 +1275,7 @@ void SettingsDelta(void)
     if (Settings.version < 0x06060012) {
       Settings.dimmer_hw_min = DEFAULT_DIMMER_MIN;
       Settings.dimmer_hw_max = DEFAULT_DIMMER_MAX;
+#ifndef NO_SONOFF_MODULE       
       if (TUYA_DIMMER == Settings.module) {
         if (Settings.flag3.ex_tuya_dimmer_min_limit) {
           Settings.dimmer_hw_min = 25;
@@ -1287,6 +1288,7 @@ void SettingsDelta(void)
         Settings.dimmer_hw_min = 10;
         Settings.dimmer_hw_max = Settings.param[P_ex_DIMMER_MAX];
       }
+#endif      
     }
     if (Settings.version < 0x06060014) {
       // Clear unused parameters for future use
