@@ -1587,12 +1587,16 @@ void GpioInit(void)
 #else
   if ((2 == Pin(GPIO_TXD)) || false) { Serial.set_tx(2); }
 #endif
+#endif
   analogWriteRange(Settings.pwm_range);      // Default is 1023 (Arduino.h)
   analogWriteFreq(Settings.pwm_frequency);   // Default is 1000 (core_esp8266_wiring_pwm.c)
 
 #ifdef ESP8266
+#ifndef NO_SONOFF_MODULE
   if ((2 == Pin(GPIO_TXD)) || (H801 == my_module_type)) { Serial.set_tx(2); }
-
+#else
+  if ((2 == Pin(GPIO_TXD)) || (false)) { Serial.set_tx(2); }
+#endif
 #ifdef USE_SPI
   spi_flg = (((PinUsed(GPIO_SPI_CS) && (Pin(GPIO_SPI_CS) > 14)) || (Pin(GPIO_SPI_CS) < 12)) || ((PinUsed(GPIO_SPI_DC) && (Pin(GPIO_SPI_DC) > 14)) || (Pin(GPIO_SPI_DC) < 12)));
   if (spi_flg) {

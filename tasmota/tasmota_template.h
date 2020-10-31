@@ -811,47 +811,8 @@ typedef struct MYTMPLT8266 {
 #ifdef NO_SONOFF_MODULE
 enum SupportedModules {
   WEMOS,
-  MAXMODULE};
-
-  
-const char kModuleNames[] PROGMEM =
-  "Generic"
-  ;
-
-
-const uint8_t kModuleNiceList[] PROGMEM = {
-  WEMOS
-};
-
-#define USER_MODULE        255
-
-
-// Default module settings
-const mytmplt kModules[MAXMODULE] PROGMEM = {
-  {                   // WEMOS - Any ESP8266/ESP8285 device like WeMos and NodeMCU hardware (ESP8266)
-    GPIO_USER,        // GPIO00 D3 Wemos Button Shield
-    GPIO_USER,        // GPIO01 TX Serial RXD
-    GPIO_USER,        // GPIO02 D4 Wemos DHT Shield
-    GPIO_USER,        // GPIO03 RX Serial TXD and Optional sensor
-    GPIO_USER,        // GPIO04 D2 Wemos I2C SDA
-    GPIO_USER,        // GPIO05 D1 Wemos I2C SCL / Wemos Relay Shield (0 = Off, 1 = On) / Wemos WS2812B RGB led Shield
-                      // GPIO06 (SD_CLK   Flash)
-                      // GPIO07 (SD_DATA0 Flash QIO/DIO/DOUT)
-                      // GPIO08 (SD_DATA1 Flash QIO/DIO/DOUT)
-    GPIO_USER,        // GPIO09 (SD_DATA2 Flash QIO or ESP8285)
-    GPIO_USER,        // GPIO10 (SD_DATA3 Flash QIO or ESP8285)
-                      // GPIO11 (SD_CMD   Flash)
-    GPIO_USER,        // GPIO12 D6
-    GPIO_USER,        // GPIO13 D7
-    GPIO_USER,        // GPIO14 D5
-    GPIO_USER,        // GPIO15 D8
-    GPIO_USER,        // GPIO16 D0 Wemos Wake
-    ADC0_USER         // ADC0 A0 Analog input
-  }
-};
-
+  MAXMODULE };
 #else
-
 enum SupportedModules {
   SONOFF_BASIC, SONOFF_RF, SONOFF_SV, SONOFF_TH, SONOFF_DUAL, SONOFF_POW, SONOFF_4CH, SONOFF_S2X, SLAMPHER, SONOFF_TOUCH,
   SONOFF_LED, CH1, CH4, MOTOR, ELECTRODRAGON, EXS_RELAY, WION, WEMOS, SONOFF_DEV, H801,
@@ -862,10 +823,12 @@ enum SupportedModules {
   OBI2, YTF_IR_BRIDGE, DIGOO, KA10, ZX2820, MI_DESK_LAMP, SP10, WAGA, SYF05, SONOFF_L1,
   SONOFF_IFAN03, EXS_DIMMER, PWM_DIMMER, SONOFF_D1, SONOFF_ZB_BRIDGE,
   MAXMODULE };
+#endif
 
 #define USER_MODULE        255
 
 const char kModuleNames[] PROGMEM =
+#ifndef NO_SONOFF_MODULE
   "Sonoff Basic|Sonoff RF|Sonoff SV|Sonoff TH|Sonoff Dual|Sonoff Pow|Sonoff 4CH|Sonoff S2X|Slampher|Sonoff Touch|"
   "Sonoff LED|1 Channel|4 Channel|Motor C/AC|ElectroDragon|EXS Relay(s)|WiOn|Generic|Sonoff Dev|H801|"
   "Sonoff SC|Sonoff BN-SZ|Sonoff 4CH Pro|Huafan SS|Sonoff Bridge|Sonoff B1|AiLight|Sonoff T1 1CH|Sonoff T1 2CH|Sonoff T1 3CH|"
@@ -875,8 +838,13 @@ const char kModuleNames[] PROGMEM =
   "OBI Socket 2|YTF IR Bridge|Digoo DG-SP202|KA10|Luminea ZX2820|Mi Desk Lamp|SP10|WAGA CHCZ02MB|SYF05|Sonoff L1|"
   "Sonoff iFan03|EXS Dimmer|PWM Dimmer|Sonoff D1|Sonoff ZbBridge"
   ;
+#else
+  "Generic"
+  ;
+#endif
 
 const uint8_t kModuleNiceList[] PROGMEM = {
+#ifndef NO_SONOFF_MODULE  
   SONOFF_BASIC,        // Sonoff Relay Devices
   SONOFF_RF,
   SONOFF_TH,
@@ -975,10 +943,12 @@ const uint8_t kModuleNiceList[] PROGMEM = {
   SYF05,
   YTF_IR_BRIDGE,
   WITTY,               // Development Devices
+#endif  
   WEMOS
 };
 
 enum SupportedTemplates8285 {
+#ifndef NO_SONOFF_MODULE 
   TMP_SONOFF_BASIC, TMP_SONOFF_SV, TMP_SONOFF_DUAL, TMP_SONOFF_POW, TMP_SONOFF_LED, TMP_ELECTRODRAGON,
   TMP_EXS_RELAY, TMP_WION, TMP_SONOFF_DEV, TMP_H801, TMP_SONOFF_SC, TMP_SONOFF_BN, TMP_HUAFAN_SS, TMP_SONOFF_BRIDGE,
   TMP_SONOFF_B1, TMP_AILIGHT, TMP_SONOFF_T11, TMP_SUPLA1, TMP_WITTY, TMP_YUNSHAN, TMP_MAGICHOME,
@@ -987,13 +957,19 @@ enum SupportedTemplates8285 {
   TMP_TECKIN, TMP_APLIC_WDP303075, TMP_TUYA_DIMMER, TMP_GOSUND, TMP_ARMTRONIX_DIMMERS, TMP_SK03_TUYA, TMP_PS_16_DZ,
   TMP_TECKIN_US, TMP_MANZOKU_EU_4, TMP_OBI2, TMP_YTF_IR_BRIDGE, TMP_DIGOO, TMP_KA10, TMP_ZX2820, TMP_MI_DESK_LAMP, TMP_SP10,
   TMP_WAGA, TMP_SYF05, TMP_EXS_DIMMER, TMP_PWM_DIMMER, TMP_SONOFF_ZB_BRIDGE,
+#endif  
   TMP_MAXMODULE_8285 };
 
 enum SupportedTemplates8266 {
+#ifdef NO_SONOFF_MODULE
   TMP_WEMOS = TMP_MAXMODULE_8285, TMP_SONOFF_4CH, TMP_SONOFF_T12, TMP_SONOFF_T13, TMP_SONOFF_DUAL_R2, TMP_SONOFF_IFAN03,
+#else
+  TMP_WEMOS = TMP_MAXMODULE_8285,
+#endif  
   TMP_MAXMODULE_8266 };
 
 const uint8_t kModuleTemplateList[MAXMODULE] PROGMEM = {
+#ifndef NO_SONOFF_MODULE  
   TMP_SONOFF_BASIC,
   TMP_SONOFF_BASIC,     // SONOFF_RF
   TMP_SONOFF_SV,
@@ -1069,6 +1045,9 @@ const uint8_t kModuleTemplateList[MAXMODULE] PROGMEM = {
   TMP_PWM_DIMMER,
   TMP_SONOFF_DUAL,      // SONOFF_D1
   TMP_SONOFF_ZB_BRIDGE,
+#else
+  TMP_WEMOS,
+#endif  
   };
 
 /*********************************************************************************************\
@@ -1076,6 +1055,7 @@ const uint8_t kModuleTemplateList[MAXMODULE] PROGMEM = {
 \*********************************************************************************************/
 
 const mytmplt8266 kModules8266[TMP_MAXMODULE_8285] PROGMEM = {
+#ifndef NO_SONOFF_MODULE  
   {                            // SONOFF_BASIC - Sonoff Basic (ESP8266)
     AGPIO(GPIO_KEY1),          // GPIO00 Button
     AGPIO(GPIO_USER),          // GPIO01 Serial RXD and Optional sensor
@@ -2137,13 +2117,14 @@ const mytmplt8266 kModules8266[TMP_MAXMODULE_8285] PROGMEM = {
     AGPIO(GPIO_KEY1),          // GPIO16 Button
     0
   }
+#endif  
 };
 
 /*********************************************************************************************\
  * Templates with 14 usable pins (ESP8285)
 \*********************************************************************************************/
 
-const mytmplt kModules8285[TMP_MAXMODULE_8266 - TMP_WEMOS] PROGMEM = {
+const mytmplt kModules8285[TMP_MAXMODULE_8266 - TMP_WEMOS] PROGMEM = {  
   {                            // WEMOS - Any ESP8266/ESP8285 device like WeMos and NodeMCU hardware (ESP8266)
     AGPIO(GPIO_USER),          // GPIO00 D3 Wemos Button Shield
     AGPIO(GPIO_USER),          // GPIO01 TX Serial RXD
@@ -2164,6 +2145,7 @@ const mytmplt kModules8285[TMP_MAXMODULE_8266 - TMP_WEMOS] PROGMEM = {
     AGPIO(GPIO_USER),          // GPIO16 D0 Wemos Wake
     AGPIO(ADC0_USER)           // ADC0 A0 Analog input
   },
+#ifdef NO_SONOFF_MODULE
   {                            // SONOFF_4CH - Sonoff 4CH (ESP8285)
     AGPIO(GPIO_KEY1),          // GPIO00 Button 1
     AGPIO(GPIO_USER),          // GPIO01 Serial RXD and Optional sensor
@@ -2253,9 +2235,8 @@ const mytmplt kModules8285[TMP_MAXMODULE_8266 - TMP_WEMOS] PROGMEM = {
     AGPIO(GPIO_REL1) +3,       // GPIO15 WIFI_O3 Relay 4 (0 = Off, 1 = On) controlling the fan
     0, 0
   }
+#endif  
 };
-#endif
-
 #endif  // ESP8266
 
 #ifdef ESP32

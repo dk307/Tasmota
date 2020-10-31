@@ -21,6 +21,12 @@
 #undef OTA_URL
 #define OTA_URL ""
 
+#undef TELE_PERIOD
+#define TELE_PERIOD  120
+
+#undef TELE_ON_POWER
+#define TELE_ON_POWER true
+
 #ifndef NO_SONOFF_MODULE
 #define NO_SONOFF_MODULE
 #endif
@@ -214,6 +220,7 @@
 #define USE_DHT
 #endif
 
+
 #ifndef USE_DHT12
 #define USE_DHT12
 #endif
@@ -228,6 +235,10 @@
 
 #ifndef USE_CHIRP
 #define USE_CHIRP
+#endif
+
+#ifndef ONLY_CHIRP_MOISTURE
+#define ONLY_CHIRP_MOISTURE
 #endif
 
 #ifndef USE_DS18x20
@@ -247,19 +258,19 @@
 #define USE_DISPLAY
 #endif
 
-#ifndef USE_GRAPH
-#define USE_GRAPH
-#endif
+// #ifndef USE_GRAPH
+// #define USE_GRAPH
+// #endif
 
-#define NUM_GRAPHS 4
+// #define NUM_GRAPHS 4
 
 #ifndef USE_DISPLAY_SSD1306
 #define USE_DISPLAY_SSD1306
 #endif
 
 // See Voltage in UI
-#ifndef USE_ADC_VCC
-#define USE_ADC_VCC
-#endif
+//#ifndef USE_ADC_VCC
+//#define USE_ADC_VCC
+//#endif
 
 #endif  // _USER_CONFIG_OVERRIDE_H_

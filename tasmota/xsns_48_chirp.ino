@@ -48,8 +48,8 @@
 
 #define XSNS_48                       48
 #define XI2C_33                       33  // See I2CDEVICES.md
-
-#define CHIRP_MAX_SENSOR_COUNT        3            // 127 is expectectd to be the max number
+ 
+#define CHIRP_MAX_SENSOR_COUNT        1           // 127 is expectectd to be the max number
 
 #define CHIRP_ADDR_STANDARD           0x20         // standard address
 
@@ -85,9 +85,11 @@ enum CHIRP_Commands {                                 // commands useable in con
 #define CHIRP_GET_CAPACITANCE       0x00          // 16 bit, read
 #define CHIRP_SET_ADDRESS           0x01          // 8 bit,  write
 #define CHIRP_GET_ADDRESS           0x02          // 8 bit,  read
+#ifndef ONLY_CHIRP_MOISTURE
 #define CHIRP_MEASURE_LIGHT         0x03          // no value, write, -> initiate measurement, then wait at least 3 seconds
 #define CHIRP_GET_LIGHT             0x04          // 16 bit, read, -> higher value means darker environment, noisy data, not calibrated
 #define CHIRP_GET_TEMPERATURE       0x05          // 16 bit, read
+#endif
 #define CHIRP_RESET                 0x06          // no value, write
 #define CHIRP_GET_VERSION           0x07          // 8 bit, read, -> 0x22 means 2.2
 #define CHIRP_SLEEP                 0x08          // no value, write
@@ -124,9 +126,11 @@ uint32_t   chirp_timeout_count  = 0;    //is handled every second, so value is e
 #pragma pack(1)
 struct ChirpSensor_t{
     uint16_t   moisture = 0;      // shall hold post-processed data, if implemented
+#ifndef ONLY_CHIRP_MOISTURE    
     uint16_t   light = 0;         // light level, maybe already postprocessed depending on the firmware
     int16_t    temperature = 0;   // temperature in degrees CELSIUS * 10 , we will also store the I2C error code
-    uint8_t    version = 0;       // firmware-version
+#endif  
+    uint8_t    version = 0;       // firmware-version  
     uint8_t    address:7;         // we need only 7bit so...
     uint8_t    explicitSleep:1;   // there is a free bit to play with ;)
 };
@@ -232,7 +236,12 @@ bool ChirpScan()
 {
   ChirpClockSet();
   chirp_found_sensors = 0;
-  for (uint8_t address = 1; address <= 127; address++) {
+
+#ifdef ONLY_CHIRP_MOISTURE    
+  uint8_t address = CHIRP_ADDR_STANDARD;  {
+#else    
+  //for (uint8_t address = 1; address <= 127; address++) {
+#endif    
     chirp_sensor[chirp_found_sensors].version = 0;
     chirp_sensor[chirp_found_sensors].version = ChirpReadVersion(address);
     delay(2);
@@ -276,6 +285,7 @@ void ChirpServiceAllSensors(uint8_t job){
         case 1:
         chirp_sensor[i].moisture = ChirpFinishReadI2CRegister16bit(chirp_sensor[i].address);
         break;
+#ifndef ONLY_CHIRP_MOISTURE       
         case 2:
         ChirpWriteI2CRegister(chirp_sensor[i].address, CHIRP_GET_TEMPERATURE);
         break;
@@ -287,10 +297,11 @@ void ChirpServiceAllSensors(uint8_t job){
         break;
         case 5:
         ChirpWriteI2CRegister(chirp_sensor[i].address, CHIRP_GET_LIGHT);
-        break;
+        break;       
         case 6:
         chirp_sensor[i].light = ChirpFinishReadI2CRegister16bit(chirp_sensor[i].address);
         break;
+#endif        
         default:
         break;
       }
@@ -339,42 +350,56 @@ void ChirpEvery100MSecond(void)
           chirp_next_job++;
           break;
           case 6:
+#ifndef ONLY_CHIRP_MOISTURE          
           DEBUG_SENSOR_LOG(PSTR("CHIRP: prepare temperature read"));
           ChirpServiceAllSensors(2);
           chirp_timeout_count = 11;  // wait 1.1 seconds,
+#endif          
           chirp_next_job++;
           break;
           case 7:
+#ifndef ONLY_CHIRP_MOISTURE          
           DEBUG_SENSOR_LOG(PSTR("CHIRP: finish temperature read"));
           ChirpServiceAllSensors(3);
+#endif          
           chirp_next_job++;
           break;
           case 8:
+#ifndef ONLY_CHIRP_MOISTURE          
           DEBUG_SENSOR_LOG(PSTR("CHIRP: prepare temperature read - 2nd"));
           ChirpServiceAllSensors(2);
           chirp_timeout_count = 11;  // wait 1.1 seconds,
+#endif          
           chirp_next_job++;
           break;
           case 9:
+#ifndef ONLY_CHIRP_MOISTURE          
           DEBUG_SENSOR_LOG(PSTR("CHIRP: finish temperature read - 2nd"));
           ChirpServiceAllSensors(3);
+#endif          
           chirp_next_job++;
           break;
           case 10:
+#ifndef ONLY_CHIRP_MOISTURE          
           DEBUG_SENSOR_LOG(PSTR("CHIRP: start light measure process"));
           ChirpServiceAllSensors(4);
           chirp_timeout_count = 90;  // wait 9 seconds,
+#endif          
           chirp_next_job++;
           break;
           case 11:
+#ifndef ONLY_CHIRP_MOISTURE          
           DEBUG_SENSOR_LOG(PSTR("CHIRP: prepare light read"));
           ChirpServiceAllSensors(5);
           chirp_timeout_count = 11;  // wait 1.1 seconds,
+#endif          
           chirp_next_job++;
           break;
           case 12:
+#ifndef ONLY_CHIRP_MOISTURE          
           DEBUG_SENSOR_LOG(PSTR("CHIRP: finish light read"));
           ChirpServiceAllSensors(6);
+#endif          
           chirp_next_job++;
           break;
           case 13:
@@ -417,12 +442,15 @@ void ChirpShow(bool json)
 {
   for (uint32_t i = 0; i < chirp_found_sensors; i++) {
     if (chirp_sensor[i].version) {
+
       // convert double values to string
+#ifndef ONLY_CHIRP_MOISTURE
       char str_temperature[33];
       double t_temperature = ((double) chirp_sensor[i].temperature )/10.0;
       dtostrfd(t_temperature, Settings.flag2.temperature_resolution, str_temperature);
       char str_light[33];
       dtostrfd(chirp_sensor[i].light, 0, str_light);
+#endif      
       char str_version[7];
       if(chirp_sensor[i].version == 0xff){
         strncpy_P(str_version, PSTR("Chirp!"), sizeof(str_version));
@@ -434,10 +462,12 @@ void ChirpShow(bool json)
       if (json) {
         if(!chirp_sensor[i].explicitSleep) {
           ResponseAppend_P(PSTR(",\"%s%u\":{\"" D_JSON_MOISTURE "\":%d"), chirp_name, i, chirp_sensor[i].moisture);
+#ifndef ONLY_CHIRP_MOISTURE          
           if(chirp_sensor[i].temperature!=-1){ // this is the error code -> no temperature
             ResponseAppend_P(PSTR(",\"" D_JSON_TEMPERATURE "\":%s"),str_temperature);
           }
           ResponseAppend_P(PSTR(",\"" D_JSON_DARKNESS "\":%s}"),str_light);
+#endif          
         }
         else {
           ResponseAppend_P(PSTR(",\"%s%u\":{\"sleeping\"}"),chirp_name, i);
@@ -456,10 +486,12 @@ void ChirpShow(bool json)
         }
         else {
           WSContentSend_PD(HTTP_SNS_MOISTURE, "", chirp_sensor[i].moisture);
+#ifndef ONLY_CHIRP_MOISTURE          
           WSContentSend_PD(HTTP_SNS_DARKNESS, str_light);
           if (chirp_sensor[i].temperature!=-1) { // this is the error code -> no temperature
             WSContentSend_PD(HTTP_SNS_TEMP, "", str_temperature, TempUnit());
           }
+#endif          
         }
 
   #endif  // USE_WEBSERVER

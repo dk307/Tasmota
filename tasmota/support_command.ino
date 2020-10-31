@@ -1602,7 +1602,7 @@ void CmndSwitchMode(void)
     ResponseCmndIdxNumber(Settings.switchmode[XdrvMailbox.index-1]);
   }
 }
-
+ 
 void CmndInterlock(void)
 {
   // Interlock 0 - Off, Interlock 1 - On, Interlock 1,2 3,4 5,6,7
