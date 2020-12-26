@@ -27,12 +27,6 @@
 #undef TELE_ON_POWER
 #define TELE_ON_POWER true
 
-#ifndef NO_SONOFF_MODULE
-#define NO_SONOFF_MODULE
-#endif
-
-
-
 ////////////////////
 #ifdef USE_DOMOTICZ
 #undef USE_DOMOTICZ
