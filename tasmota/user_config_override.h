@@ -179,7 +179,7 @@
 #endif
 
 #ifdef USE_ENERGY_SENSOR
-#undef USE_ENERGY_SENSOR
+#define USE_ENERGY_SENSOR
 #endif
 
 #ifdef USE_PZEM004T
@@ -262,9 +262,13 @@
 #define USE_DISPLAY_SSD1306
 #endif
 
+#ifndef SHOW_SPLASH
+#define SHOW_SPLASH
+#endif
+
 // See Voltage in UI
-//#ifndef USE_ADC_VCC
-//#define USE_ADC_VCC
-//#endif
+#ifndef USE_ADC_VCC
+#define USE_ADC_VCC
+#endif
 
 #endif  // _USER_CONFIG_OVERRIDE_H_
