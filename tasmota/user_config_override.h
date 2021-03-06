@@ -6,8 +6,74 @@
 
 #define MODULE                 WEMOS
 
-#undef FALLBACK_MODULE
-#define FALLBACK_MODULE        WEMOS
+// not sure if this does anything
+#ifndef USE_UFILESYS
+#define USE_UFILESYS
+#endif
+
+#ifndef MAXBUTTONS
+#define MAXBUTTONS 16
+#endif
+
+#ifndef USE_SCRIPT
+#define USE_SCRIPT  // adds about 17k flash size, variable ram size
+#endif
+
+#ifndef USE_BUTTON_EVENT
+#define USE_BUTTON_EVENT
+#endif
+
+#ifndef USE_SCRIPT_JSON_EXPORT
+#define USE_SCRIPT_JSON_EXPORT
+#endif
+
+#ifndef USE_SCRIPT_SUB_COMMAND
+#define USE_SCRIPT_SUB_COMMAND
+#endif
+ 
+#ifndef USE_SCRIPT_STATUS
+#define USE_SCRIPT_STATUS
+#endif
+
+#ifndef SCRIPT_POWER_SECTION
+#define SCRIPT_POWER_SECTION
+#endif
+
+#ifndef USE_SCRIPT_WEB_DISPLAY
+#define USE_SCRIPT_WEB_DISPLAY
+#endif
+
+#ifndef SCRIPT_FULL_WEBPAGE
+#define SCRIPT_FULL_WEBPAGE
+#endif
+
+#ifndef USE_TOUCH_BUTTONS
+#define USE_TOUCH_BUTTONS
+#endif
+
+#ifndef USE_WEBSEND_RESPONSE
+#define USE_WEBSEND_RESPONSE
+#endif
+
+#ifndef USE_SCRIPT_FATFS_EXT
+#define USE_SCRIPT_FATFS_EXT
+#endif
+
+#ifndef USE_SCRIPT_FATFS
+#define USE_SCRIPT_FATFS -1
+#endif
+
+#ifndef USE_SCRIPT_GLOBVARS
+#define USE_SCRIPT_GLOBVARS
+#endif
+
+#ifndef USE_GOOGLE_CHARTS
+#define USE_GOOGLE_CHARTS
+#endif
+
+#ifdef USE_RULES
+#undef USE_RULES
+#endif 
 
 #undef GUI_SHOW_HOSTNAME
 #define GUI_SHOW_HOSTNAME      true
@@ -22,10 +88,13 @@
 #define OTA_URL ""
 
 #undef TELE_PERIOD
-#define TELE_PERIOD  120
+#define TELE_PERIOD  60
 
 #undef TELE_ON_POWER
 #define TELE_ON_POWER true
+
+#undef WIFI_CONFIG_TOOL
+#define WIFI_CONFIG_TOOL WIFI_MANAGER_RESET_ONLY
 
 ////////////////////
 #ifdef USE_DOMOTICZ
@@ -252,11 +321,9 @@
 #define USE_DISPLAY
 #endif
 
-// #ifndef USE_GRAPH
-// #define USE_GRAPH
-// #endif
-
-// #define NUM_GRAPHS 4
+#ifdef USE_DISPLAY_MODES1TO5
+#undef USE_DISPLAY_MODES1TO5
+#endif
 
 #ifndef USE_DISPLAY_SSD1306
 #define USE_DISPLAY_SSD1306
@@ -267,8 +334,15 @@
 #endif
 
 // See Voltage in UI
-#ifndef USE_ADC_VCC
-#define USE_ADC_VCC
+#ifdef USE_ADC_VCC
+#undef USE_ADC_VCC
 #endif
 
-#endif  // _USER_CONFIG_OVERRIDE_H_
+#ifndef USE_MQTT_TLS 
+#define USE_MQTT_TLS                             // Use TLS for MQTT connection (+34.5k code, +7.0k mem and +4.8k additional during connection handshake)
+//  #define USE_MQTT_TLS_CA_CERT                   // Force full CA validation instead of fingerprints, slower, but simpler to use.  (+2.2k code, +1.9k mem during connection handshake)
+                                                   // This includes the LetsEncrypt CA in tasmota_ca.ino for verifying server certificates
+//  #define USE_MQTT_TLS_FORCE_EC_CIPHER           // Force Elliptic Curve cipher (higher security) required by some servers (automatically enabled with USE_MQTT_AWS_IOT) (+11.4k code, +0.4k mem)
+#endif
+
+ #endif  // _USER_CONFIG_OVERRIDE_H_
